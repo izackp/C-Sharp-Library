@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using System;
+﻿using System;
+using System.Collections.Generic;
 
 public static class ArrayExt {
 
@@ -9,21 +9,6 @@ public static class ArrayExt {
 
 		return list[index];
 	}
-    /*
-    public static T Last<T>(this IList<T> list) {
-        int index = list.Count - 1;
-        if (index < 0)
-            return default(T);
-
-        return list[index];
-    }
-
-    public static T First<T>(this IList<T> list) {
-        if (list.Count == 0)
-            return default(T);
-
-        return list[0];
-    }*/
 
     public static T[] SubArray<T>(this T[] data, int index, int length) {
         T[] result = new T[length];
