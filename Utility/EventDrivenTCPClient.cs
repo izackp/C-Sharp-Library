@@ -215,7 +215,7 @@ public class EventDrivenTCPClient : IDisposable {
             return;
         }
         _bodyPos = 0;
-        _expectedBodyLength = BitConverter.ToInt32(_headerBuffer, _headerPos);
+        _expectedBodyLength = BitConverter.ToInt32(_headerBuffer, 0);
         socket.BeginReceive(_bodyBuffer, 0, _expectedBodyLength, SocketFlags.None, new AsyncCallback(cbBodyReceived), socket);
     }
 
