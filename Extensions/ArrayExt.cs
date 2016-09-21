@@ -10,6 +10,16 @@ public static class ArrayExt {
 		return list[index];
 	}
 
+    public static T PopLast<T>(this IList<T> list) {
+        int index = list.Count;
+        if (index == 0)
+            return default(T);
+        index -= 1;
+        T instance = list[index];
+        list.RemoveAt(index);
+        return instance;
+    }
+
     public static T[] SubArray<T>(this T[] data, int index, int length) {
         T[] result = new T[length];
         Array.Copy(data, index, result, 0, length);
