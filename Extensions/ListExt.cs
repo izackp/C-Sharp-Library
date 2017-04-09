@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace AgeOfWrath.Extensions
+namespace CSharp_Library.Extensions
 {
     public static class ListExt
     {
