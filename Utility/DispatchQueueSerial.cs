@@ -39,7 +39,7 @@ namespace CSharp_Library.Utility {
             }
         }
 
-        void Sync(Action act) {
+        public void Sync(Action act) {
             ManualResetEvent wait = new ManualResetEvent(false);
             Async(() => {
                 act.Invoke();
