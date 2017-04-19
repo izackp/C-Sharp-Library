@@ -2,23 +2,19 @@
 using CSharp_Library.Extensions;
 
 namespace CSharp_Library.Utility {
-    public class CacheableInstance {
-        public bool IsCached = false;
-        public virtual int ID {
-            get; set;
-        }
+    public interface ICacheableInstance {
+        bool IsCached { get; set; }
+        int ID { get; set; }
 
-        public virtual void Clear() {
-
-        }
+        void Clear();
     }
 
-    public class InstanceCache<T> where T: CacheableInstance, new() {
+    public class InstanceCache<T> where T: ICacheableInstance, new() {
         int lastId = 0;
         List<T> cache = new List<T>();
 
         public T CachedInstance() {
-            T instance = null;
+            T instance = default(T);
             lock (cache) {
                 instance = cache.PopLast();
                 if (instance != null) {
