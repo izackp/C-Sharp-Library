@@ -2,7 +2,7 @@
 using System;
 using System.Net;
 using System.Net.Sockets;
-using System.Text;
+using CSharp_Library.Extensions;
 
 /// <summary>
 /// Event driven TCP client wrapper
