@@ -39,10 +39,9 @@ public class EventDrivenTCPClient : IDisposable {
         Error
     }
 
-    public EventDrivenTCPClient(IPAddress ip, int port, bool autoreconnect = true, bool noDelay = true) {
+    public EventDrivenTCPClient(IPAddress ip, int port, bool noDelay = true) {
         _IP = ip;
         _Port = port;
-        _AutoReconnect = autoreconnect;
         _client = new TcpClient(AddressFamily.InterNetwork);
         _client.NoDelay = noDelay; //Disable the nagel algorithm for simplicity
 
@@ -264,8 +263,7 @@ public class EventDrivenTCPClient : IDisposable {
     int _expectedBodyLength = 0;
     byte[] _headerBuffer = new byte[4];
     int _headerPos = 0;
-
-    bool _AutoReconnect = false;
+    
     int _Port = 0;
     object _SyncLock = new object();
 

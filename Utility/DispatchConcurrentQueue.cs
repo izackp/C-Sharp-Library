@@ -176,8 +176,6 @@ namespace CSharp_Library.Utility {
                     if (_disposed)
                         return null;
 
-                    bool tasksAvailable = (_tasks.Count > 0);
-
                     if (_suspended == false) {
                         Action task = NextPrioritizedTask();
                         if (task != null) {
