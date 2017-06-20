@@ -28,5 +28,13 @@ namespace CSharp_Library.Extensions
             list.RemoveAt(pos);
             return obj;
         }
+
+        public static bool RemoveFirst<T>(this List<T> list, Predicate<T> predicate) {
+            int index = list.FindIndex(predicate);
+            if (index == -1)
+                return false;
+            list.RemoveAt(index);
+            return true;
+        }
     }
 }

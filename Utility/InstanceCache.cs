@@ -25,7 +25,6 @@ namespace CSharp_Library.Utility {
                 lastId += 1;
                 instance = new T();
                 instance.ID = lastId;
-                cache.Add(instance);
             }
             return instance;
         }
