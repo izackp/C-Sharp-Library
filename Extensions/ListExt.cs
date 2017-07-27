@@ -119,11 +119,11 @@ namespace CSharp_Library.Extensions
             return list.BinarySearch(item, new ComparisonComparer<T>(compare));
         }
 
-        public static int BinarySearch<T>(this List<T> list, Func<T, int> compare) where T : class {
+        public static int BinarySearch<T>(this List<T> list, Func<T, int> compare) {
             Comparison<T> newCompare = (a, b) => compare(a);
-            return list.BinarySearch(null, newCompare);
+            return list.BinarySearch(default(T), new ComparisonComparer<T>(newCompare));
         }
-
+        
         public static T BinarySearchOrDefault<T>(this List<T> list, T item, Comparison<T> compare) {
             int i = list.BinarySearch(item, compare);
             if (i >= 0)

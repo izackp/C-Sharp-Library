@@ -10,6 +10,14 @@ namespace CSharp_Library.Extensions {
 
             return list[index];
         }
+        
+        public static T Last<T>(this T[] list) {
+            return list[list.Length - 1];
+        }
+
+        public static T Last<T>(this IList<T> list) {
+            return list[list.Count - 1];
+        }
 
         public static T PopLast<T>(this IList<T> list) {
             int index = list.Count;
