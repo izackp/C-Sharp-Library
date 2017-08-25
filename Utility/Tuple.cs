@@ -1,4 +1,6 @@
 ﻿
+//TODO: Tuple was introduce in C#7 so we need check better than NET35
+#if NET35
 namespace CSharp_Library.Utility {
 
     public class Tuple<T1, T2> {
@@ -17,3 +19,4 @@ namespace CSharp_Library.Utility {
         }
     }
 }
+#endif

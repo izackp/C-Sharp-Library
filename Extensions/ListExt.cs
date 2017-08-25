@@ -1,11 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using CSharp_Library.Utility;
 
 namespace CSharp_Library.Extensions
 {
     public static class ListExt
     {
+        public static List<Tuple<T, O>> CreatePair<T, O>(this IList<T> list) where O : new() {
+            List<Tuple<T, O>> newList = new List<Tuple<T, O>>(list.Count);
+            foreach (T item in list) {
+                newList.Add(new Tuple<T, O>(item, new O()));
+            }
+            return newList;
+        }
+
         public static void Push<T>(this IList<T> list, T item)
         {
             list.Add(item);
@@ -116,12 +125,12 @@ namespace CSharp_Library.Extensions
         }
 
         public static int BinarySearch<T>(this List<T> list, T item, Comparison<T> compare) {
-            return list.BinarySearch(item, new ComparisonComparer<T>(compare));
+            return BinarySearch(list.ToArray(), 0, list.Count, item, compare);
         }
 
         public static int BinarySearch<T>(this List<T> list, Func<T, int> compare) {
             Comparison<T> newCompare = (a, b) => compare(a);
-            return list.BinarySearch(default(T), new ComparisonComparer<T>(newCompare));
+            return BinarySearch(list.ToArray(), 0, list.Count, default(T), newCompare);
         }
         
         public static T BinarySearchOrDefault<T>(this List<T> list, T item, Comparison<T> compare) {
@@ -170,6 +179,26 @@ namespace CSharp_Library.Extensions
 
         public static int LinearSearch<T>(this List<object> list, Predicate<T> predicate) where T : class {
             return list.FindIndex(FilterByType(predicate));
+        }
+
+        // No idea why the system implementation is passing value to the first parameter instead of the second
+        static int BinarySearch<T>(this T[] array, int index, int length, T value, Comparison<T> comparer) {
+
+            int lo = index;
+            int hi = index + length - 1;
+            while (lo <= hi) {
+                int i = lo + ((hi - lo) >> 1);
+                int order = comparer(array[i], value); 
+
+                if (order == 0) return i;
+                if (order < 0) {
+                    lo = i + 1;
+                } else {
+                    hi = i - 1;
+                }
+            }
+
+            return ~lo;
         }
     }
 
