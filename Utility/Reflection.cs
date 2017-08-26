@@ -6,6 +6,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using CSharp_Library.Extensions;
 
 namespace CSharp_Library.Utility
 {
@@ -248,7 +249,7 @@ namespace CSharp_Library.Utility
 
         public static MethodInfo MethodWithAttribute<T>(MethodInfo[] listMethods) {
             foreach (MethodInfo method in listMethods) {
-                if (method.GetCustomAttributes().OfType<T>().Any()) {
+                if (method.GetCustomAttributes(typeof(T), true).Length > 0) {
                     return method;
                 }
             }
