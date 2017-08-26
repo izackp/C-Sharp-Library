@@ -3,7 +3,7 @@ using CSharp_Library.Extensions;
 
 namespace CSharp_Library.Utility {
     public interface ICacheableInstance {
-        bool IsCached { get; set; }
+        bool IsCached { get; set; } //Sometimes we need to check if the instance is 'alive' especially with callbacks
         int ID { get; set; }
 
         void Clear();
