@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System;
+﻿using System;
 using System.Net;
 using System.Net.Sockets;
 using CSharp_Library.Extensions;
@@ -122,7 +121,7 @@ public class EventDrivenTCPClient : IDisposable {
 
         Int32 dataLength = body.Length;
         byte[] header = BitConverter.GetBytes(dataLength);
-        byte[] data = header.Concat(body);
+        byte[] data = header.Combine(body);
 
         SocketError err = new SocketError();
         _client.Client.BeginSend(data, 0, data.Length, SocketFlags.None, out err, new AsyncCallback(cbSendComplete), _client.Client);
@@ -138,7 +137,7 @@ public class EventDrivenTCPClient : IDisposable {
     #endregion
 
     #region Callbacks
-    private void cbConnectComplete() {
+    void cbConnectComplete() {
         if (_client.Connected == false) {
             ConnectionState = ConnectionStatus.Error;
             return;
@@ -149,7 +148,7 @@ public class EventDrivenTCPClient : IDisposable {
         _client.Client.BeginReceive(_headerBuffer, 0, 4, SocketFlags.None, new AsyncCallback(cbReceivedHeader), _client.Client);
     }
 
-    private void cbDisconnectByHostComplete(IAsyncResult result) {
+    void cbDisconnectByHostComplete(IAsyncResult result) {
         Socket socket = _client.Client;
         socket.EndDisconnect(result);
 
@@ -157,7 +156,7 @@ public class EventDrivenTCPClient : IDisposable {
             Connect();
     }
 
-    private void cbDisconnectComplete(IAsyncResult result) {
+    void cbDisconnectComplete(IAsyncResult result) {
         Socket socket = _client.Client;
         socket.EndDisconnect(result);
 
@@ -201,7 +200,7 @@ public class EventDrivenTCPClient : IDisposable {
         }
     }
 
-    private void cbChangeConnectionStateComplete(IAsyncResult result) {
+    void cbChangeConnectionStateComplete(IAsyncResult result) {
         ConnectionStatusChanged.EndInvoke(result);
     }
 
@@ -218,7 +217,7 @@ public class EventDrivenTCPClient : IDisposable {
         socket.BeginReceive(_bodyBuffer, 0, _expectedBodyLength, SocketFlags.None, new AsyncCallback(cbBodyReceived), socket);
     }
 
-    private void cbBodyReceived(IAsyncResult result) {
+    void cbBodyReceived(IAsyncResult result) {
         Socket socket = _client.Client;
         int bytes = EndReceive(result);
         _bodyPos += bytes;
@@ -249,7 +248,7 @@ public class EventDrivenTCPClient : IDisposable {
         return bytes;
     }
 
-    private void cbDataRecievedCallbackComplete(IAsyncResult result) {
+    void cbDataRecievedCallbackComplete(IAsyncResult result) {
         DataReceived.EndInvoke(result);
     }
     #endregion

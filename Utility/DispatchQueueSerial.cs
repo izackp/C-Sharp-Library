@@ -6,7 +6,6 @@ namespace CSharp_Library.Utility {
     //Avoids creating more threads by using the global queue
     //Otherwise you could just create an instance of DispatchConcurrentQueue with just 1 worker for a similar effect
     public class DispatchQueueSerial : Dispatch {
-        DispatchConcurrentQueue _dispatchQueue;
         Queue<Action> _actionQueue = new Queue<Action>();
         bool _finished = true;
         Priority _priority;
