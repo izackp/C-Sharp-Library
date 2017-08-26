@@ -1,11 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using CSharp_Library.Utility;
 
 namespace CSharp_Library.Extensions
 {
     public static class ListExt
     {
+        public static List<Tuple<T, O>> CreatePair<T, O>(this IList<T> list) where O : new() {
+            List<Tuple<T, O>> newList = new List<Tuple<T, O>>(list.Count);
+            foreach (T item in list) {
+                newList.Add(new Tuple<T, O>(item, new O()));
+            }
+            return newList;
+        }
+
         public static void Push<T>(this IList<T> list, T item)
         {
             list.Add(item);

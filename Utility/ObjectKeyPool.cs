@@ -17,7 +17,6 @@ namespace CSharp_Library.Utility {
                 _poolData[key] = listForKey;
             }
             listForKey.Add(obj);
-            //Debug.LogWarning("+" + key + "(" + listForKey.Count + ")");
         }
 
         public object Retrieve(string key) {
@@ -33,7 +32,6 @@ namespace CSharp_Library.Utility {
 
             object obj = listForKey[listForKey.Count - 1];
             listForKey.RemoveAt(listForKey.Count - 1);
-            //Debug.LogWarning("-" + key + "(" + listForKey.Count + ")");
             return obj;
         }
     }
