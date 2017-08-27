@@ -173,7 +173,8 @@ public class DataWriter {
         }
         if (bit) {
             byte flagByte = Data[_lastFlagBytePos];
-            Data[_lastFlagBytePos] = (byte)(flagByte | (1 << _flagCount));
+            flagByte = (byte)(flagByte | (1 << _flagCount));
+            Data[_lastFlagBytePos] = flagByte;
         }
         _flagCount += 1;
     }
