@@ -63,7 +63,7 @@ namespace CSharp_Library.Utility
                     }
                     else if (type.GetTypeInfo().IsInterface) // some know interfaces
                     {
-                        if(type.GetTypeInfo().IsGenericType)
+                        if (type.GetTypeInfo().IsGenericType)
                         {
                             var typeDef = type.GetGenericTypeDefinition();
 

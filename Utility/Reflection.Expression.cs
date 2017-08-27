@@ -14,7 +14,10 @@ namespace CSharp_Library.Utility {
     {
         public static CreateObject CreateClass(Type type)
         {
-            return Expression.Lambda<CreateObject>(Expression.New(type)).Compile();
+            var newType = Expression.New(type);
+            var lambda = Expression.Lambda<CreateObject>(newType);
+            CreateObject c = lambda.Compile();
+            return c;
         }
 
         public static CreateObject CreateStruct(Type type)
