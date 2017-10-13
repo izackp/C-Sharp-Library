@@ -23,7 +23,7 @@ namespace CSharp_Library.Utility
     /// <summary>
     /// Helper class to get entity properties and map as BsonValue
     /// </summary>
-    public partial class Reflection
+    public static partial class Reflection
     {
         private static Dictionary<Type, CreateObject> _cacheCtor = new Dictionary<Type, CreateObject>();
 
@@ -36,23 +36,22 @@ namespace CSharp_Library.Utility
         {
             try
             {
-                CreateObject c;
-                if (_cacheCtor.TryGetValue(type, out c))
+                if (_cacheCtor.TryGetValue(type, out CreateObject c))
                 {
                     return c();
                 }
             }
             catch (Exception ex)
             {
-                throw new Exception(string.Format("Failed to create instance for type '{0}' from assembly '{1}'. Checks if the class has a public constructor with no parameters.", type.FullName, type.AssemblyQualifiedName));
+                throw new Exception(
+                    $"Failed to create instance for type '{type.FullName}' from assembly '{type.AssemblyQualifiedName}'. Checks if the class has a public constructor with no parameters.");
             }
 
             lock (_cacheCtor)
             {
                 try
                 {
-                    CreateObject c = null;
-                    if (_cacheCtor.TryGetValue(type, out c))
+                    if (_cacheCtor.TryGetValue(type, out CreateObject c))
                     {
                         return c();
                     }
@@ -73,20 +72,19 @@ namespace CSharp_Library.Utility
                             {
                                 return CreateInstance(GetGenericListOfType(UnderlyingTypeOf(type)));
                             }
-                            else if (typeDef == typeof(IDictionary<,>))
-                            {
-#if NET35
+                            else if (typeDef == typeof(IDictionary<,>)) {
+#if NET35 || NET40
                                 var k = type.GetGenericArguments()[0];
                                 var v = type.GetGenericArguments()[1];
 #else
-                                var k = type.GetTypeInfo().GenericTypeArguments[0];
-                                var v = type.GetTypeInfo().GenericTypeArguments[1];
+                                //var k = type.GetTypeInfo().GenericTypeArguments[0];
+                                //var v = type.GetTypeInfo().GenericTypeArguments[1];
 #endif
                                 return CreateInstance(GetGenericDictionaryOfType(k, v));
                             }
                         }
                         
-                        throw new Exception(string.Format("Failed to create instance for type '{0}' from assembly '{1}'. Checks if the class has a public constructor with no parameters.", type.FullName, type.AssemblyQualifiedName));
+                        throw new Exception($"Failed to create instance for type '{type.FullName}' from assembly '{type.AssemblyQualifiedName}'. Checks if the class has a public constructor with no parameters.");
                     }
                     else // structs
                     {
@@ -97,7 +95,7 @@ namespace CSharp_Library.Utility
                 }
                 catch (Exception ex)
                 {
-                    throw new Exception(string.Format("Failed to create instance for type '{0}' from assembly '{1}'. Checks if the class has a public constructor with no parameters.", type.FullName, type.AssemblyQualifiedName));
+                    throw new Exception($"Failed to create instance for type '{type.FullName}' from assembly '{type.AssemblyQualifiedName}'. Checks if the class has a public constructor with no parameters.");
                 }
             }
         }
@@ -108,9 +106,10 @@ namespace CSharp_Library.Utility
 
         public static bool IsNullable(Type type)
         {
-            if (!type.GetTypeInfo().IsGenericType) return false;
-            var g = type.GetGenericTypeDefinition();
-            return (g.Equals(typeof(Nullable<>)));
+            if (!type.GetTypeInfo().IsGenericType)
+                return false;
+            Type g = type.GetGenericTypeDefinition();
+            return g.Equals(typeof(Nullable<>));
         }
 
         /// <summary>
@@ -119,7 +118,7 @@ namespace CSharp_Library.Utility
         public static Type UnderlyingTypeOf(Type type)
         {
             // works only for generics (if type is not generic, returns same type)
-#if NET35
+#if NET35 || NET40
             if (!type.IsGenericType) return type;
 
             return type.GetGenericArguments()[0];
@@ -150,7 +149,7 @@ namespace CSharp_Library.Utility
             if (listType.IsArray)
                 return listType.GetElementType();
 
-#if NET35
+#if NET35 || NET40
             foreach (var i in listType.GetInterfaces())
 #else
             foreach (var i in listType.GetTypeInfo().ImplementedInterfaces)
@@ -158,7 +157,7 @@ namespace CSharp_Library.Utility
             {
                 if (i.GetTypeInfo().IsGenericType && i.GetGenericTypeDefinition() == typeof(IEnumerable<>))
                 {
-#if NET35
+#if NET35 || NET40
                     return i.GetGenericArguments()[0];
 #else
                     return i.GetTypeInfo().GenericTypeArguments[0];
@@ -168,7 +167,7 @@ namespace CSharp_Library.Utility
                 // from #395
                 else if(listType.GetTypeInfo().IsGenericType && i == typeof(IEnumerable))
                 {
-#if NET35
+#if NET35 || NET40
                     return listType.GetGenericArguments()[0];
 #else
                     return listType.GetTypeInfo().GenericTypeArguments[0];
@@ -189,7 +188,7 @@ namespace CSharp_Library.Utility
             if (GetMethod(type, "Add", 1) == null)
                 return false;
 
-#if NET35
+#if NET35 || NET40
             foreach (var @interface in type.GetInterfaces())
 #else
             foreach (var @interface in type.GetTypeInfo().ImplementedInterfaces)
@@ -239,7 +238,7 @@ namespace CSharp_Library.Utility
         }
 
         public static Type[] GetGenericArgumentsExt(Type type) {
-#if NET35
+#if NET35 || NET40
             Type[] genericArguments = type.GetGenericArguments();
 #else
             Type[] genericArguments = type.GetTypeInfo().GenericTypeArguments;
@@ -256,6 +255,41 @@ namespace CSharp_Library.Utility
             return null;
         }
 
+        public static IEnumerable<MemberInfo> GetMembers(this Type type, bool includeProperties = true, bool includeFields = false, bool includeNonPublic = false) {
+
+            BindingFlags flags = (BindingFlags.Public | BindingFlags.Instance);
+            if (includeNonPublic)
+                flags |= BindingFlags.NonPublic;
+
+            if (includeProperties && includeFields) {
+                MemberInfo[] properties = type.GetProperties(flags).Where(x => x.CanRead).ToArray<MemberInfo>();
+                MemberInfo[] fields = type.GetNonStaticFields(flags);
+                MemberInfo[] allValues = ArrayExt.Combine(properties, fields);
+                return allValues;
+            }
+
+            if (includeProperties) {
+                MemberInfo[] properties = type.GetProperties(flags).Where(x => x.CanRead).ToArray<MemberInfo>();
+                return properties;
+            }
+
+            if (includeFields) {
+                MemberInfo[] fields = type.GetNonStaticFields(flags);
+                return fields;
+            }
+
+            return null;
+        }
+
+        public static PropertyInfo[] GetReadableProperties(this Type type, BindingFlags flags) {
+            PropertyInfo[] properties = type.GetProperties(flags).Where(x => x.CanRead).ToArray();
+            return properties;
+        }
+
+        public static FieldInfo[] GetNonStaticFields(this Type type, BindingFlags flags) {
+            FieldInfo[] fields = type.GetFields(flags).Where(x => !x.Name.EndsWith("k__BackingField") && x.IsStatic == false).ToArray();
+            return fields;
+        }
         #endregion
     }
 }

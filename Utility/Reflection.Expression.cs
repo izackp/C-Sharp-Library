@@ -10,7 +10,7 @@ namespace CSharp_Library.Utility {
     /// <summary>
     /// Using Expressions is the easy and fast way to create classes, structs, get/set fields/properties. But it not works in NET35
     /// </summary>
-    public partial class Reflection
+    public static partial class Reflection
     {
         public static CreateObject CreateClass(Type type)
         {
