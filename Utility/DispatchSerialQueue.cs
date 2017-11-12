@@ -5,12 +5,14 @@ using System.Threading;
 namespace CSharp_Library.Utility {
     //Avoids creating more threads by using the global queue
     //Otherwise you could just create an instance of DispatchConcurrentQueue with just 1 worker for a similar effect
-    public class DispatchQueueSerial : Dispatch {
-        Queue<Action> _actionQueue = new Queue<Action>();
+    //The serial nature comes from the fact that this class adds only 1 job at a time to the concurrent queue.
+    //Once one is finished the next is added so its not possible for more than 1 job to execute simulatiously.
+    public class DispatchSerialQueue : Dispatch {
+        readonly Queue<Action> _actionQueue = new Queue<Action>();
+        readonly Priority _priority;
         bool _finished = true;
-        Priority _priority;
 
-        public DispatchQueueSerial(string name, Priority priority = Priority.Normal) : base(name) {
+        public DispatchSerialQueue(string name, Priority priority = Priority.Normal) : base(name) {
             _priority = priority;
         }
 

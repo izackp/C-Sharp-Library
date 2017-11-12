@@ -170,7 +170,7 @@ namespace CSharp_Library.Utility {
             }
         }
 
-        private Action GetTaskOrWait() {
+        Action GetTaskOrWait() {
             lock (_tasks) {
                 while (true) {
                     if (_disposed)
@@ -188,7 +188,7 @@ namespace CSharp_Library.Utility {
             }
         }
 
-        private Action NextPrioritizedTask() {
+        Action NextPrioritizedTask() {
             if (_tasks_highest.Count > 0)
                 return _tasks_highest.Dequeue();
 
@@ -207,7 +207,7 @@ namespace CSharp_Library.Utility {
             return null;
         }
 
-        private int TotalTaskCount() {
+        int TotalTaskCount() {
             return _tasks_highest.Count + _tasks_high.Count + _tasks.Count + _tasks_low.Count + _tasks_lowest.Count;
         }
     }
