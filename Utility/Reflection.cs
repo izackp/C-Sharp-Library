@@ -6,6 +6,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.Serialization;
 using CSharp_Library.Extensions;
 
 namespace CSharp_Library.Utility
@@ -77,11 +78,15 @@ namespace CSharp_Library.Utility
                                 var k = type.GetGenericArguments()[0];
                                 var v = type.GetGenericArguments()[1];
 #else
-                                //var k = type.GetTypeInfo().GenericTypeArguments[0];
-                                //var v = type.GetTypeInfo().GenericTypeArguments[1];
+                                var k = type.GetTypeInfo().GenericTypeArguments[0];
+                                var v = type.GetTypeInfo().GenericTypeArguments[1];
 #endif
                                 return CreateInstance(GetGenericDictionaryOfType(k, v));
                             }
+                        } else {
+                            c = () => { return (object)FormatterServices.GetUninitializedObject(type); };
+                            _cacheCtor.Add(type, c);
+                            return c();
                         }
                         
                         throw new Exception($"Failed to create instance for type '{type.FullName}' from assembly '{type.AssemblyQualifiedName}'. Checks if the class has a public constructor with no parameters.");
@@ -178,33 +183,43 @@ namespace CSharp_Library.Utility
             return typeof(object);
         }
 
+        public enum ListType
+        {
+            None,
+            Array,
+            GenericEnumerable,
+            Enumerable
+        }
+
         /// <summary>
         /// Returns true if Type is any kind of Array/IList/ICollection/....
         /// </summary>
-        public static bool IsList(Type type)
+        public static ListType FindListType(Type type)
         {
-            if (type.IsArray) return true;
+            if (type.IsArray) return ListType.Array; //True for myType[]
 
             if (GetMethod(type, "Add", 1) == null)
-                return false;
+                return ListType.None;
+
 
 #if NET35 || NET40
-            foreach (var @interface in type.GetInterfaces())
+            var list = type.GetInterfaces();
 #else
-            foreach (var @interface in type.GetTypeInfo().ImplementedInterfaces)
+            var list = type.GetTypeInfo().ImplementedInterfaces;
+
 #endif
+            foreach (var @interface in list)
             {
-                if (@interface.GetTypeInfo().IsGenericType)
-                {
-                    if (@interface.GetGenericTypeDefinition() == typeof(IEnumerable<>))
-                    {
-                        // if needed, you can also return the type used as generic argument
-                        return true;
-                    }
-                }
+                if (@interface.GetTypeInfo().IsGenericType == false)
+                    continue;
+                if (@interface.GetGenericTypeDefinition() == typeof(IEnumerable<>))
+                    return ListType.GenericEnumerable;
             }
 
-            return false;
+            if (typeof(IEnumerable).IsAssignableFrom(type))
+                return ListType.Enumerable;
+
+            return ListType.None;
         }
 
         public static MethodInfo GetMethod(Type type, string name, int numParameters) {

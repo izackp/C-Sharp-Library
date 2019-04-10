@@ -4,7 +4,6 @@
 using System;
 using System.Linq.Expressions;
 using System.Reflection;
-using CSharp_Library.Extensions;
 
 namespace CSharp_Library.Utility {
     /// <summary>
@@ -66,7 +65,11 @@ namespace CSharp_Library.Utility {
             return ((t, v) => {
                 object convertedTarget = Convert.ChangeType(t, type);
                 object convertedValue = (v == null || dataType.IsAssignableFrom(v.GetType())) ? v : Convert.ChangeType(v, dataType);
-                propertyInfo.SetValue(convertedTarget, convertedValue, null);
+                if (propertyInfo != null) {
+                    propertyInfo.SetValue(convertedTarget, convertedValue, null);
+                } else {
+                    fieldInfo.SetValue(convertedTarget, convertedValue);
+                }
             });
         }
     }
