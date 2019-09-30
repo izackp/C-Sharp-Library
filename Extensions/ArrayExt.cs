@@ -19,6 +19,13 @@ namespace CSharp_Library.Extensions {
             return list[list.Count - 1];
         }
 
+        public static T LastOrNull<T>(this IList<T> list) {
+            int index = list.Count;
+            if (index == 0)
+                return default(T);
+            return list[list.Count - 1];
+        }
+
         public static T PopLast<T>(this IList<T> list) {
             int index = list.Count;
             if (index == 0)
