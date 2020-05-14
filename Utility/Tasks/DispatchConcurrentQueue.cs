@@ -9,6 +9,8 @@ using System.Threading;
     Set.Get Context
     dispatch_after
     Pipe/Channel (pass array of actions)
+
+    TODO: unnecessary with builtin async framework?
 */
 
 namespace CSharp_Library.Utility {
@@ -113,12 +115,12 @@ namespace CSharp_Library.Utility {
             if (IsSuspended())
                 Console.WriteLine("Warning: Calling a synchronous method on a suspended queue which will not execute until resumed.");
 
-            ManualResetEvent wait = new ManualResetEvent(false);
+            ManualResetEventSlim wait = new ManualResetEventSlim(false);
             Async(() => {
                 act.Invoke();
                 wait.Set();
             }, priority);
-            wait.WaitOne();
+            wait.Wait();
         }
 
         private Queue<Action> QueueForPriority(Priority priority) {

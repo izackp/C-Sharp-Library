@@ -15,7 +15,7 @@ public class WeakAction {
 
     static readonly object[] sNoParams = new object[] { };
 
-    public void Execute() {
+    public void Invoke() {
         object strongTarget = null;
 
         if (weakHolder.IsAlive)
@@ -26,13 +26,13 @@ public class WeakAction {
 #if UNITY_5_3_OR_NEWER
     public static implicit operator UnityEngine.Events.UnityAction(WeakAction m) {
 
-        return m.Execute;
+        return m.Invoke;
     }
 #endif
 
     public static implicit operator Action(WeakAction m) {
 
-        return m.Execute;
+        return m.Invoke;
     }
 }
 
@@ -45,7 +45,7 @@ public class WeakAction<T> {
         method = action.Method;
     }
 
-    public void Execute(T arg) {
+    public void Invoke(T arg) {
         object strongTarget = null;
 
         if (weakHolder.IsAlive)
@@ -56,12 +56,12 @@ public class WeakAction<T> {
 #if UNITY_5_3_OR_NEWER
     public static implicit operator UnityEngine.Events.UnityAction(WeakAction m) {
 
-        return m.Execute;
+        return m.Invoke;
     }
 #endif
 
     public static implicit operator Action<T>(WeakAction<T> m) {
 
-        return m.Execute;
+        return m.Invoke;
     }
 }

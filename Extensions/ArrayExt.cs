@@ -59,5 +59,23 @@ namespace CSharp_Library.Extensions {
             Array.Copy(y, 0, newArray, x.Length, y.Length);
             return newArray;
         }
+
+        public static R[] Map<T, R>(this T[] target, Func<T,R> func) {
+            var result = new R[target.Length];
+            for(int i = 0; i < target.Length; i+=1) {
+                result[i] = func(target[i]);
+            }
+            return result;
+        }
+        /*
+        public static T First<T>(this IEnumerable<T> list, T altValue) {
+            var enumerator = list.GetEnumerator();
+            var hasValue = enumerator.MoveNext();
+            if (hasValue == false) {
+                return altValue;
+            }
+            return enumerator.Current;
+        }*/
+        
     }
 }
