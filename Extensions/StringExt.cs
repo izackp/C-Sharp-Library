@@ -15,5 +15,12 @@ namespace CSharp_Library.Extensions {
                               .Where(c => !Char.IsWhiteSpace(c))
                               .ToArray());
         }
+
+        public static char First(this string input, char altValue) {
+            if (input.Length == 0) {
+                return altValue;
+            }
+            return input[0];
+        }
     }
 }

@@ -3,6 +3,7 @@ using System.Reflection;
 
 //If there are any problems refer to an alternative implementation here:
 //https://codereview.stackexchange.com/questions/8807/weakaction-implementation
+//TODO: MethodInfo.Invoke() is (should be) very slow compared to an actual delegate.
 public class WeakAction {
     WeakReference weakHolder;
     MethodInfo method;
@@ -14,7 +15,7 @@ public class WeakAction {
 
     static readonly object[] sNoParams = new object[] { };
 
-    public void Execute() {
+    public void Invoke() {
         object strongTarget = null;
 
         if (weakHolder.IsAlive)
@@ -25,12 +26,42 @@ public class WeakAction {
 #if UNITY_5_3_OR_NEWER
     public static implicit operator UnityEngine.Events.UnityAction(WeakAction m) {
 
-        return m.Execute;
+        return m.Invoke;
     }
 #endif
 
     public static implicit operator Action(WeakAction m) {
 
-        return m.Execute;
+        return m.Invoke;
+    }
+}
+
+public class WeakAction<T> {
+    WeakReference weakHolder;
+    MethodInfo method;
+
+    public WeakAction(Action<T> action) {
+        weakHolder = new WeakReference(action.Target);
+        method = action.Method;
+    }
+
+    public void Invoke(T arg) {
+        object strongTarget = null;
+
+        if (weakHolder.IsAlive)
+            strongTarget = weakHolder.Target;
+        method.Invoke(strongTarget, new object[] { arg });
+    }
+
+#if UNITY_5_3_OR_NEWER
+    public static implicit operator UnityEngine.Events.UnityAction(WeakAction m) {
+
+        return m.Invoke;
+    }
+#endif
+
+    public static implicit operator Action<T>(WeakAction<T> m) {
+
+        return m.Invoke;
     }
 }

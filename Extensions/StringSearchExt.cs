@@ -70,10 +70,10 @@ namespace CSharp_Library.Extensions {
             return finalPiece;
         }
 
-        static public string[] FindAllStringsInBetween(this string target, string prefix, string suffix)
+        static public string[] FindAllStringsInBetween(this string target, string prefix, string suffix, int skip = 0)
         {
             List<string> matched = new List<string>();
-            int progress = 0;
+            int progress = skip;
             while (true)
             {
                 int indexStart = target.IndexOf(prefix, progress);

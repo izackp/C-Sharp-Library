@@ -9,6 +9,8 @@ using System.Threading;
     Set.Get Context
     dispatch_after
     Pipe/Channel (pass array of actions)
+
+    TODO: unnecessary with builtin async framework?
 */
 
 namespace CSharp_Library.Utility {
@@ -43,7 +45,7 @@ namespace CSharp_Library.Utility {
 
     public class DispatchConcurrentQueue : Dispatch, IDisposable {
 
-        readonly LinkedList<Thread> _workers;
+        readonly Thread[]           _workers;
         readonly Queue<Action>      _tasks_highest  = new Queue<Action>();
         readonly Queue<Action>      _tasks_high     = new Queue<Action>();
         readonly Queue<Action>      _tasks          = new Queue<Action>();
@@ -56,11 +58,11 @@ namespace CSharp_Library.Utility {
         public bool KeepAlive = false; //Will block the disposing thread until all tasks are finished
 
         public DispatchConcurrentQueue(string name, int size) : base(name) {
-            _workers = new LinkedList<Thread>();
+            _workers = new Thread[size];
             for (var i = 0; i < size; ++i) {
                 var worker = new Thread(Worker) { Name = string.Concat(_name, " - Worker ", i) };
                 worker.Start();
-                _workers.AddLast(worker);
+                _workers[i] = worker;
             }
         }
 
@@ -113,12 +115,12 @@ namespace CSharp_Library.Utility {
             if (IsSuspended())
                 Console.WriteLine("Warning: Calling a synchronous method on a suspended queue which will not execute until resumed.");
 
-            ManualResetEvent wait = new ManualResetEvent(false);
+            ManualResetEventSlim wait = new ManualResetEventSlim(false);
             Async(() => {
                 act.Invoke();
                 wait.Set();
             }, priority);
-            wait.WaitOne();
+            wait.Wait();
         }
 
         private Queue<Action> QueueForPriority(Priority priority) {
