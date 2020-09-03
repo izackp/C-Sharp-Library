@@ -169,6 +169,7 @@ namespace CSharp_Library.Utility.Data {
         void WriteBit(bool bit) {
             if (_lastFlagBytePos == -1 || _flagCount == 8) {
                 _lastFlagBytePos = Position;
+                Data[_lastFlagBytePos] = 0;
                 Position += 1;
                 _flagCount = 0;
             }
